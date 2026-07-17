@@ -1,13 +1,9 @@
-# Hi-Lo Trainer Pro v3
+# Hi-Lo Trainer Pro v4
 
-Novinky:
-- realistické hrací karty s horním levým a dolním pravým rohem
-- skutečné rozmístění znaků u číselných karet
-- stylizované obrázky J/Q/K
-- animace rozdání, otočení a lesku karty
-- animace v Hi-Lo tréninku i blackjackové hře
-- zablokované dvojité přiblížení na iPhonu
-- zachované režimy Hi-Lo, KO, Omega II, Halves, casino, speed a hardcore
+Tato verze opravuje:
+- starou PWA cache,
+- neaktualizované karty,
+- dvojité přibližování na iPhonu,
+- zoom při zaměření inputu.
 
-## Aktualizace GitHubu
-Nahraj všech 7 souborů do kořene repozitáře a potvrď přepsání. GitHub Pages se aktualizuje automaticky.
+Používá nové názvy `styles-v4.css` a `app-v4.js`, takže Safari nemůže načíst starou verzi z cache.
