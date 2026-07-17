@@ -1,260 +1,110 @@
 <!doctype html>
 <html lang="cs">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#07111f" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Hi-Lo Trainer" />
-  <link rel="manifest" href="./manifest.webmanifest" />
-  <link rel="stylesheet" href="./styles.css" />
-  <title>Hi‑Lo Blackjack Trainer</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07111f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="styles.css">
+<title>Hi‑Lo Trainer Pro</title>
 </head>
 <body>
-  <div class="app-shell">
-    <header class="topbar">
-      <div>
-        <p class="eyebrow">BLACKJACK TRAINING LAB</p>
-        <h1>Hi‑Lo Trainer</h1>
-      </div>
-      <button id="installBtn" class="icon-btn hidden" aria-label="Nainstalovat aplikaci">＋</button>
-    </header>
+<div class="app">
+<header><div><small>BLACKJACK TRAINING LAB</small><h1>Hi‑Lo Trainer Pro</h1></div><button id="install" hidden>＋</button></header>
 
-    <main>
-      <section class="hero">
-        <div>
-          <p class="hero-kicker">Trénuj přesnost, rychlost a rozhodování.</p>
-          <h2>Počítej karty bez chaosu.</h2>
-          <p class="hero-copy">Offline PWA pro Hi‑Lo, true count, základní strategii a simulaci blackjacku. Bez propojení na sázkové účty.</p>
-        </div>
-        <div class="hero-badge">
-          <span id="streakValue">0</span>
-          <small>denní série</small>
-        </div>
-      </section>
+<section class="hero">
+<div><b>Trénuj count, rychlost i rozhodování</b><p>Offline aplikace pro Hi‑Lo, KO, Omega II, Halves a basic strategy.</p></div>
+<div class="streak"><strong id="dayStreak">1</strong><span>denní série</span></div>
+</section>
 
-      <nav class="tabs" aria-label="Sekce aplikace">
-        <button class="tab active" data-tab="trainer">Trenažér</button>
-        <button class="tab" data-tab="game">Hra</button>
-        <button class="tab" data-tab="strategy">Strategie</button>
-        <button class="tab" data-tab="stats">Statistiky</button>
-      </nav>
+<section class="daily">
+<div><small>DENNÍ VÝZVA</small><b>50 karet</b><span id="dailyText">0 / 50</span></div>
+<div id="dailyRing" class="ring"><span id="dailyPct">0%</span></div>
+</section>
 
-      <section id="trainer" class="panel active-panel">
-        <div class="dashboard-grid">
-          <article class="metric-card">
-            <span>Running count</span>
-            <strong id="runningCount">0</strong>
-          </article>
-          <article class="metric-card">
-            <span>True count</span>
-            <strong id="trueCount">0.00</strong>
-          </article>
-          <article class="metric-card">
-            <span>Karet zbývá</span>
-            <strong id="cardsLeft">52</strong>
-          </article>
-          <article class="metric-card">
-            <span>Přesnost</span>
-            <strong id="accuracy">100%</strong>
-          </article>
-        </div>
+<nav>
+<button class="tab active" data-tab="trainer">Trenažér</button>
+<button class="tab" data-tab="game">Hra</button>
+<button class="tab" data-tab="strategy">Strategie</button>
+<button class="tab" data-tab="stats">Statistiky</button>
+</nav>
 
-        <article class="card panel-card">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">SHOE SETUP</p>
-              <h3>Nastavení balíčku</h3>
-            </div>
-            <button id="resetTrainer" class="secondary-btn">Reset</button>
-          </div>
-          <div class="form-grid">
-            <label>
-              Počet balíčků
-              <select id="deckCount">
-                <option value="1">1 balíček</option>
-                <option value="2">2 balíčky</option>
-                <option value="4">4 balíčky</option>
-                <option value="6">6 balíčků</option>
-                <option value="8">8 balíčků</option>
-              </select>
-            </label>
-            <label>
-              Režim
-              <select id="trainerMode">
-                <option value="single">Jedna karta</option>
-                <option value="pairs">Dvojice karet</option>
-                <option value="speed">Rychlostní režim</option>
-              </select>
-            </label>
-          </div>
-        </article>
+<main>
+<section id="trainer" class="panel active">
+<div class="metrics">
+<div><span>Running</span><strong id="running">0</strong></div>
+<div><span>True count</span><strong id="trueCount">0.00</strong></div>
+<div><span>Karet zbývá</span><strong id="left">52</strong></div>
+<div><span>Přesnost</span><strong id="accuracy">100%</strong></div>
+</div>
 
-        <article class="card table-card">
-          <div class="count-strip">
-            <span id="countSignal" class="signal neutral">Neutrální shoe</span>
-            <span id="decksLeftLabel">1.00 balíčku zbývá</span>
-          </div>
+<div class="card settings">
+<div class="row"><h2>Nastavení</h2><button id="reset">Reset</button></div>
+<div class="form">
+<label>Balíčky<select id="decks"><option>1</option><option>2</option><option>4</option><option>6</option><option>8</option></select></label>
+<label>Systém<select id="system"><option value="hilo">Hi‑Lo</option><option value="ko">KO</option><option value="omega">Omega II</option><option value="halves">Halves</option></select></label>
+<label>Režim<select id="mode"><option value="single">Jedna karta</option><option value="pairs">Dvojice</option><option value="casino">Kasino stůl</option><option value="speed">Speed</option><option value="hardcore">Hardcore 0,8 s</option></select></label>
+<label>Rychlost<select id="speed"><option value="2000">2,0 s</option><option value="1300" selected>1,3 s</option><option value="800">0,8 s</option><option value="500">0,5 s</option></select></label>
+</div>
+</div>
 
-          <div id="cardStage" class="card-stage" aria-live="polite">
-            <div class="playing-card card-back">
-              <div class="card-logo">HI‑LO</div>
-            </div>
-          </div>
+<div class="card table">
+<div class="row muted"><span id="signal">Neutrální shoe</span><span id="decksLeft">1.00 balíčku</span></div>
+<div id="stage" class="stage"><div class="playing back">HI‑LO</div></div>
 
-          <div class="guess-row">
-            <label>
-              Tvůj odhad running countu
-              <input id="countGuess" type="number" inputmode="numeric" placeholder="např. 3" />
-            </label>
-            <button id="checkGuess" class="primary-btn">Zkontrolovat</button>
-          </div>
+<div class="stepper">
+<span>Tvůj odhad running countu</span>
+<div class="stepRow"><button id="minus">−</button><strong id="guess">0</strong><button id="plus">＋</button></div>
+<div class="quick"><button data-d="-5">−5</button><button data-d="-1">−1</button><button id="zero">0</button><button data-d="1">+1</button><button data-d="5">+5</button></div>
+</div>
 
-          <div class="action-grid">
-            <button id="drawCard" class="primary-btn">Otočit kartu</button>
-            <button id="skipGuess" class="secondary-btn">Ukázat správný count</button>
-          </div>
+<button id="check" class="primary">Zkontrolovat</button>
+<div class="actions"><button id="draw" class="primary">Otočit kartu</button><button id="reveal">Ukázat správný count</button></div>
+<div id="feedback" class="feedback">Otoč první kartu.</div>
+</div>
 
-          <div id="trainerFeedback" class="feedback neutral">
-            Otoč první kartu a drž průběžný součet v hlavě.
-          </div>
-        </article>
+<div class="card"><div class="row"><h2>Historie</h2><b id="timer">00:00</b></div><div id="history" class="history"></div></div>
+</section>
 
-        <article class="card panel-card">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">RECENT CARDS</p>
-              <h3>Historie</h3>
-            </div>
-            <span id="timerValue" class="timer">00:00</span>
-          </div>
-          <div id="history" class="history"></div>
-        </article>
-      </section>
+<section id="game" class="panel">
+<div class="card felt">
+<div class="row"><div><small>SIMULACE</small><h2>Blackjack proti dealerovi</h2></div><div class="money"><span>Bankroll</span><strong id="bankroll">10 000</strong></div></div>
+<h3>Dealer <span id="dealerTotal">?</span></h3><div id="dealerHand" class="hand"></div>
+<h3>Ty <span id="playerTotal">0</span></h3><div id="playerHand" class="hand"></div>
+<div class="chips"><button data-chip="50">+50</button><button data-chip="100">+100</button><button data-chip="250">+250</button><button data-chip="500">+500</button></div>
+<p class="center">Sázka: <b id="bet">100</b></p>
+<div class="gamebuttons"><button id="deal" class="primary">Rozdat</button><button id="hit" disabled>Hit</button><button id="stand" disabled>Stand</button><button id="double" disabled>Double</button></div>
+<div id="gameMsg" class="feedback">Rozdej novou hru.</div><p id="hint">Doporučení strategie se zobrazí během hry.</p>
+</div>
+</section>
 
-      <section id="game" class="panel">
-        <article class="card blackjack-table">
-          <div class="table-top">
-            <div>
-              <p class="eyebrow">SIMULACE</p>
-              <h3>Blackjack proti dealerovi</h3>
-            </div>
-            <div class="bankroll">
-              <small>Tréninkový bankroll</small>
-              <strong id="bankroll">10 000</strong>
-            </div>
-          </div>
+<section id="strategy" class="panel">
+<div class="card">
+<h2>Basic strategy kalkulátor</h2>
+<div class="form">
+<label>Tvoje karty<input id="cardsInput" placeholder="A,7 nebo 10,6"></label>
+<label>Dealer<select id="dealerUp"><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>J</option><option>Q</option><option>K</option><option>A</option></select></label>
+</div>
+<button id="calc" class="primary">Doporučit tah</button>
+<div class="result"><span>Doporučený tah</span><strong id="result">—</strong><p id="reason">Zadej karty.</p></div>
+</div>
+<div class="card"><h2 id="mapTitle">Hi‑Lo mapa</h2><div id="map" class="map"></div></div>
+</section>
 
-          <div class="hand-block">
-            <div class="hand-title"><span>Dealer</span><strong id="dealerTotal">?</strong></div>
-            <div id="dealerHand" class="hand"></div>
-          </div>
-
-          <div class="hand-block">
-            <div class="hand-title"><span>Ty</span><strong id="playerTotal">0</strong></div>
-            <div id="playerHand" class="hand"></div>
-          </div>
-
-          <div class="bet-controls">
-            <button class="chip-btn" data-chip="50">+50</button>
-            <button class="chip-btn" data-chip="100">+100</button>
-            <button class="chip-btn" data-chip="250">+250</button>
-            <button class="chip-btn" data-chip="500">+500</button>
-          </div>
-          <div class="bet-line">Sázka: <strong id="betAmount">100</strong></div>
-
-          <div class="action-grid game-actions">
-            <button id="dealBtn" class="primary-btn">Rozdat</button>
-            <button id="hitBtn" class="secondary-btn" disabled>Hit</button>
-            <button id="standBtn" class="secondary-btn" disabled>Stand</button>
-            <button id="doubleBtn" class="secondary-btn" disabled>Double</button>
-          </div>
-
-          <div id="gameFeedback" class="feedback neutral">Rozdej novou tréninkovou hru.</div>
-          <div id="strategyHint" class="strategy-hint">Doporučení strategie se zobrazí během hry.</div>
-        </article>
-      </section>
-
-      <section id="strategy" class="panel">
-        <article class="card panel-card">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">BASIC STRATEGY</p>
-              <h3>Kalkulátor tahu</h3>
-            </div>
-          </div>
-          <div class="form-grid strategy-grid">
-            <label>
-              Tvoje karty
-              <input id="playerCardsInput" placeholder="např. A,7 nebo 10,6" />
-            </label>
-            <label>
-              Odkrytá karta dealera
-              <select id="dealerUpcard">
-                <option>2</option><option>3</option><option>4</option><option>5</option>
-                <option>6</option><option>7</option><option>8</option><option>9</option>
-                <option>10</option><option>J</option><option>Q</option><option>K</option><option>A</option>
-              </select>
-            </label>
-          </div>
-          <button id="calculateStrategy" class="primary-btn full-btn">Doporučit tah</button>
-          <div class="strategy-result">
-            <small>Doporučený tah</small>
-            <strong id="strategyResult">—</strong>
-            <p id="strategyReason">Zadej dvě karty a kartu dealera.</p>
-          </div>
-        </article>
-
-        <article class="card panel-card">
-          <p class="eyebrow">HI‑LO MAPA</p>
-          <h3>Hodnoty karet</h3>
-          <div class="hilo-map">
-            <div><strong>+1</strong><span>2, 3, 4, 5, 6</span></div>
-            <div><strong>0</strong><span>7, 8, 9</span></div>
-            <div><strong>−1</strong><span>10, J, Q, K, A</span></div>
-          </div>
-        </article>
-      </section>
-
-      <section id="stats" class="panel">
-        <div class="dashboard-grid">
-          <article class="metric-card">
-            <span>Celkem karet</span>
-            <strong id="statsCards">0</strong>
-          </article>
-          <article class="metric-card">
-            <span>Správné odhady</span>
-            <strong id="statsCorrect">0</strong>
-          </article>
-          <article class="metric-card">
-            <span>Nejlepší série</span>
-            <strong id="statsBestStreak">0</strong>
-          </article>
-          <article class="metric-card">
-            <span>Odehraných her</span>
-            <strong id="statsGames">0</strong>
-          </article>
-        </div>
-
-        <article class="card panel-card">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">PROGRESS</p>
-              <h3>Poslední výsledky</h3>
-            </div>
-            <button id="clearStats" class="secondary-btn">Vymazat</button>
-          </div>
-          <div id="sessionList" class="session-list"></div>
-        </article>
-      </section>
-    </main>
-
-    <footer>
-      Tréninkový nástroj. Nejde o automatizované sázení ani záruku výhry.
-    </footer>
-  </div>
-
-  <script src="./app.js"></script>
-</body>
-</html>
+<section id="stats" class="panel">
+<div class="metrics">
+<div><span>Karet</span><strong id="statCards">0</strong></div>
+<div><span>Správně</span><strong id="statCorrect">0</strong></div>
+<div><span>Nejlepší série</span><strong id="statStreak">0</strong></div>
+<div><span>Her</span><strong id="statGames">0</strong></div>
+</div>
+<div class="card"><h2>Vývoj countu</h2><canvas id="chart" width="800" height="260"></canvas></div>
+<div class="card"><h2>Achievementy</h2><div id="achievements" class="achievements"></div></div>
+<div class="card"><div class="row"><h2>Poslední tréninky</h2><button id="clear">Vymazat</button></div><div id="sessions"></div></div>
+</section>
+</main>
+<footer>Výuková simulace. Není propojena se sázkovou platformou.</footer>
+</div>
+<script src="app.js"></script>
+</body></html>

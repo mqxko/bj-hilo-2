@@ -1,21 +1,6 @@
-# Hi-Lo Blackjack Trainer
+# Hi-Lo Trainer Pro v2
 
-Mobilní PWA pro trénink:
+Obsahuje Hi-Lo, KO, Omega II, Halves, speed/hardcore režim, kasino stůl, graf countu, denní výzvy, achievementy, basic strategy, blackjack simulaci a offline PWA.
 
-- Hi-Lo running count
-- true count
-- rychlostní režim
-- základní blackjacková strategie
-- simulace hry proti dealerovi
-- lokální statistiky
-- offline použití
-
-## GitHub Pages
-
-1. Nahraj všechny soubory do kořene repozitáře.
-2. Otevři Settings → Pages.
-3. Source: Deploy from a branch.
-4. Branch: main, folder /(root).
-5. Save.
-
-Aplikace je výuková. Není propojená s žádnou sázkovou platformou.
+## Aktualizace GitHubu
+Nahraj všech 7 souborů do kořene repozitáře a potvrď přepsání stávajících souborů. GitHub Pages se po commitu aktualizuje automaticky.
