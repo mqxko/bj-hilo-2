@@ -5,10 +5,53 @@ function load(){try{return JSON.parse(localStorage.getItem("hiloPro"))||{cards:0
 function save(){localStorage.setItem("hiloPro",JSON.stringify(S.stats));renderStats()}
 function shoe(n){let a=[];for(let d=0;d<n;d++)for(const s of SUITS)for(const r of RANKS)a.push({r,s});for(let i=a.length-1;i;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function val(r){return SYSTEMS[$("system").value].v[r]}function signed(n){return n>0?`+${n}`:`${n}`}
-function card(c,mini=false,hidden=false){if(hidden)return `<div class="mini hiddenCard"></div>`;let red=c.s==="♥"||c.s==="♦";return `<div class="${mini?"mini":"playing"} ${red?"red":""}"><b class="rank">${c.r}</b><i class="centerSuit">${c.s}</i><i class="suit">${c.s}</i></div>`}
+function pipPositions(rank){
+  const map={
+    "2":[[2,1],[2,5]],
+    "3":[[2,1],[2,3],[2,5]],
+    "4":[[1,1],[3,1],[1,5],[3,5]],
+    "5":[[1,1],[3,1],[2,3],[1,5],[3,5]],
+    "6":[[1,1],[3,1],[1,3],[3,3],[1,5],[3,5]],
+    "7":[[1,1],[3,1],[2,2],[1,3],[3,3],[1,5],[3,5]],
+    "8":[[1,1],[3,1],[2,2],[1,3],[3,3],[2,4],[1,5],[3,5]],
+    "9":[[1,1],[3,1],[1,2],[3,2],[2,3],[1,4],[3,4],[1,5],[3,5]],
+    "10":[[1,1],[3,1],[2,2],[1,2],[3,2],[1,3],[3,3],[1,4],[3,4],[2,5]]
+  };
+  return map[rank]||[];
+}
+function cardFaceHtml(c,mini=false){
+  const red=c.s==="♥"||c.s==="♦";
+  const rank=c.r;
+  let center="";
+  if(rank==="A"){
+    center=`<div class="ace-pip">${c.s}</div>`;
+  }else if(["J","Q","K"].includes(rank)){
+    center=`<div class="face-card">${rank}${c.s}</div>`;
+  }else{
+    const pips=pipPositions(rank).map(([col,row],i)=>{
+      const flip=row>=4?" flip-pip":"";
+      return `<span class="pip${flip}" style="grid-column:${col};grid-row:${row}">${c.s}</span>`;
+    }).join("");
+    center=`<div class="pip-grid">${pips}</div>`;
+  }
+  return `<div class="${mini?"mini":"playing"} ${red?"red":""} card-shine">
+    <div class="corner top"><span class="corner-rank">${rank}</span><span class="corner-suit">${c.s}</span></div>
+    <div class="pips">${center}</div>
+    <div class="corner bottom"><span class="corner-rank">${rank}</span><span class="corner-suit">${c.s}</span></div>
+  </div>`;
+}
+function card(c,mini=false,hidden=false,anim="deal"){
+  const cls=anim==="flip"?"card-flip-in":anim==="pop"?"card-pop":"card-deal-in";
+  if(hidden)return `<div class="card-wrap ${cls}"><div class="mini hiddenCard back"></div></div>`;
+  return `<div class="card-wrap ${cls}">${cardFaceHtml(c,mini)}</div>`;
+}
 function reset(){S.shoe=shoe(+$("decks").value);S.running=0;S.current=[];S.shown=false;S.guess=0;S.history=[];S.counts=[0];S.attempts=0;S.correct=0;S.streak=0;S.start=Date.now();$("stage").innerHTML='<div class="playing back">HI‑LO</div>';guess(0);feedback("Otoč první kartu.","");clearInterval(S.timer);S.timer=setInterval(()=>{let t=Math.floor((Date.now()-S.start)/1000);$("timer").textContent=`${String(t/60|0).padStart(2,"0")}:${String(t%60).padStart(2,"0")}`},1000);ui()}
 function guess(n){S.guess=Math.round(n*2)/2;$("guess").textContent=signed(S.guess)}
-function draw(){if(S.shown)return feedback("Nejdřív zkontroluj odhad.","bad");if(!S.shoe.length)return endSession();let m=$("mode").value,n=m==="pairs"?2:m==="casino"?6:1;S.current=[];for(let i=0;i<n&&S.shoe.length;i++)S.current.push(S.shoe.pop());if(m==="casino")$("stage").innerHTML=`<div class="casino">${S.current.map((c,i)=>`<div class="seat"><small>${i===5?"Dealer":`Hráč ${i+1}`}</small>${card(c)}</div>`).join("")}</div>`;else $("stage").innerHTML=S.current.map(c=>card(c)).join("");$("stage").classList.remove("flip");void $("stage").offsetWidth;$("stage").classList.add("flip");S.shown=true;if(m==="speed"||m==="hardcore")setTimeout(()=>{if(S.shown)$("stage").innerHTML='<div class="playing back">COUNT?</div>'},m==="hardcore"?800:+$("speed").value)}
+function draw(){if(S.shown)return feedback("Nejdřív zkontroluj odhad.","bad");if(!S.shoe.length)return endSession();let m=$("mode").value,n=m==="pairs"?2:m==="casino"?6:1;S.current=[];for(let i=0;i<n&&S.shoe.length;i++)S.current.push(S.shoe.pop());if(m==="casino"){
+  $("stage").innerHTML=`<div class="casino">${S.current.map((c,i)=>`<div class="seat"><small>${i===5?"Dealer":`Hráč ${i+1}`}</small><div style="animation-delay:${i*70}ms">${card(c,false,false,"flip")}</div></div>`).join("")}</div>`;
+}else{
+  $("stage").innerHTML=S.current.map((c,i)=>`<div style="animation-delay:${i*90}ms">${card(c,false,false,"flip")}</div>`).join("");
+}S.shown=true;if(m==="speed"||m==="hardcore")setTimeout(()=>{if(S.shown)$("stage").innerHTML='<div class="playing back">COUNT?</div>'},m==="hardcore"?800:+$("speed").value)}
 function check(show=false){if(!S.shown)return feedback("Nejdřív otoč kartu.","bad");let next=S.running+S.current.reduce((a,c)=>a+val(c.r),0);S.attempts++;S.stats.cards+=S.current.length;S.stats.daily=(S.stats.daily||0)+S.current.length;if(!show&&S.guess===next){S.correct++;S.stats.correct++;S.streak++;S.stats.best=Math.max(S.stats.best||0,S.streak);feedback(`Správně. Count je ${signed(next)}.`,"good")}else{S.streak=0;feedback(`Správný count je ${signed(next)}.` ,show?"":"bad")}S.running=next;S.history.push(...S.current);S.current=[];S.shown=false;S.counts.push(next);guess(0);save();ui()}
 function ui(){let dl=Math.max(S.shoe.length/52,.01),tc=S.running/dl;$("running").textContent=signed(S.running);$("trueCount").textContent=signed(tc.toFixed(2));$("left").textContent=S.shoe.length;$("accuracy").textContent=S.attempts?`${Math.round(S.correct/S.attempts*100)}%`:"100%";$("decksLeft").textContent=`${(S.shoe.length/52).toFixed(2)} balíčku`;$("signal").textContent=tc>=2?"Více vysokých karet":tc<=0?"Nevýhodný / neutrální shoe":"Mírně pozitivní shoe";$("history").innerHTML=S.history.slice(-20).map(c=>`<span>${c.r}${c.s}</span>`).join("");chart()}
 function feedback(t,c){$("feedback").textContent=t;$("feedback").className=`feedback ${c}`}
@@ -19,7 +62,8 @@ $("minus").onclick=()=>guess(S.guess-1);$("plus").onclick=()=>guess(S.guess+1);$
 
 function hv(h){let t=0,a=0;h.forEach(c=>{if(c.r==="A"){t+=11;a++}else if("KQJ".includes(c.r))t+=10;else t+=+c.r});while(t>21&&a){t-=10;a--}return{t,soft:a>0}}
 function gr(){if(S.game.shoe.length<40)S.game.shoe=shoe(6);return S.game.shoe.pop()}
-function renderGame(show=false){$("playerHand").innerHTML=S.game.p.map(c=>card(c,true)).join("");$("dealerHand").innerHTML=S.game.d.map((c,i)=>card(c,true,!show&&i===1)).join("");$("playerTotal").textContent=hv(S.game.p).t;$("dealerTotal").textContent=show?hv(S.game.d).t:"?";$("bankroll").textContent=S.game.bank.toLocaleString("cs-CZ");$("bet").textContent=S.game.bet.toLocaleString("cs-CZ")}
+function renderGame(show=false){$("playerHand").innerHTML=S.game.p.map((c,i)=>`<div style="animation-delay:${i*85}ms">${card(c,true,false,"deal")}</div>`).join("");
+$("dealerHand").innerHTML=S.game.d.map((c,i)=>`<div style="animation-delay:${i*85}ms">${card(c,true,!show&&i===1,"deal")}</div>`).join("");$("playerTotal").textContent=hv(S.game.p).t;$("dealerTotal").textContent=show?hv(S.game.d).t:"?";$("bankroll").textContent=S.game.bank.toLocaleString("cs-CZ");$("bet").textContent=S.game.bet.toLocaleString("cs-CZ")}
 function action(cards,dealer){let d=["J","Q","K"].includes(dealer.r)?10:dealer.r==="A"?11:+dealer.r,v=hv(cards),t=v.t;if(cards.length===2&&(["J","Q","K"].includes(cards[0].r)?10:cards[0].r)===(["J","Q","K"].includes(cards[1].r)?10:cards[1].r)){let r=cards[0].r;if(r==="A"||r==="8")return["SPLIT","Tento pár se standardně rozděluje."];if(["10","J","Q","K"].includes(r))return["STAND","Dvacítku nerozděluj."]}if(v.soft&&t===18)return d>=3&&d<=6?["DOUBLE","Soft 18 proti slabému dealerovi."]:d===2||d===7||d===8?["STAND","Tady je lepší stát."]:["HIT","Proti silné kartě vezmi kartu."];if(t>=17)return["STAND","17 nebo více."];if(t>=13)return d<=6?["STAND","Dealer má slabou kartu."]:["HIT","Dealer má silnou kartu."];if(t===12)return d>=4&&d<=6?["STAND","Dealer 4–6 má vyšší bust šanci."]:["HIT","Vezmi kartu."];if(t===11)return["DOUBLE","Jedenáctka je silný double."];if(t===10)return d<=9?["DOUBLE","Desítka proti 2–9."]:["HIT","Proti 10/A hit."];if(t===9)return d>=3&&d<=6?["DOUBLE","Devítka proti 3–6."]:["HIT","Vezmi kartu."];return["HIT","Nízký součet."]}
 function gameMsg(t,c=""){$("gameMsg").textContent=t;$("gameMsg").className=`feedback ${c}`}
 function buttons(on){$("deal").disabled=on;$("hit").disabled=!on;$("stand").disabled=!on;$("double").disabled=!on}
@@ -40,3 +84,10 @@ let today=new Date().toISOString().slice(0,10);if(S.stats.day!==today){if(S.stat
 let deferred;addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferred=e;$("install").hidden=false});$("install").onclick=async()=>{if(deferred){deferred.prompt();await deferred.userChoice;$("install").hidden=true}};
 if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
 map();reset();S.game.shoe=shoe(6);renderGame();renderStats();
+let lastTouchEnd=0;
+document.addEventListener("touchend",function(e){
+  const now=Date.now();
+  if(now-lastTouchEnd<=300)e.preventDefault();
+  lastTouchEnd=now;
+},{passive:false});
+document.addEventListener("gesturestart",e=>e.preventDefault(),{passive:false});
