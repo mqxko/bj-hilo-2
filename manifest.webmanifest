@@ -1,0 +1,17 @@
+{
+  "name": "Hi-Lo Blackjack Trainer",
+  "short_name": "Hi-Lo Trainer",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#07111f",
+  "theme_color": "#07111f",
+  "description": "Offline trénink Hi-Lo, true countu a základní blackjackové strategie.",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
